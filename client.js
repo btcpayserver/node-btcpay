@@ -113,22 +113,13 @@ BTCPayClient.prototype._unsigned_request = function (path, payload) {
 }
 
 
-BTCPayClient.prototype.get_rates = function (crypto='BTC', store_id) {
+BTCPayClient.prototype.get_rates = function (currencyPairs, store_id) {
     let _params = {cryptoCode: crypto}
-    if (store_id) {
-        _params['storeID'] = store_id
-    }
-    return this._signed_get_request('/rates/', _params)
-}
-
-
-BTCPayClient.prototype.get_rate = function (currency, crypto='BTC', store_id) {
-    return this.get_rates(crypto, store_id).then(rates => {
-        let rate = _.find(rates, rate => { return rate.code == currency.toUpperCase()})
-        return new Promise(function (resolve, reject) {
-            resolve(rate.rate)
-        })
-    })
+    
+    _params['storeID'] = store_id
+    _params['currencyPairs'] = currencyPairs
+    
+    return this._signed_get_request('/rates', _params)
 }
 
 
@@ -143,7 +134,7 @@ BTCPayClient.prototype.create_invoice = function (payload, token) {
         throw 'Price must be a float'
     }
 
-    return this._signed_post_request('/invoices/', payload, token)
+    return this._signed_post_request('/invoices', payload, token)
 }
 
 

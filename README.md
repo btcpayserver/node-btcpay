@@ -37,15 +37,10 @@ var client = new btcpay.BTCPayClient('https://btcpayserverhostname', keypair, {m
 
 ## Get rates
 ```js
-client.get_rates().then(rates => console.log(rates))
+client.get_rates('BTC_USD', <store_id>).then(rates => console.log(rates))
 ```
 
-
-## Create specific rate
-```js
-client.get_rate('USD').then(rate => console.log(rate))
-```
-
+The first argument accept comma-separated list of currency pair.
 
 ## Create invoice
 See BitPay API documentation: https://bitpay.com/api#resource-Invoices
