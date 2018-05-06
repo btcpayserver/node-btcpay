@@ -37,7 +37,7 @@ var client = new btcpay.BTCPayClient('https://btcpayserverhostname', keypair, {m
 
 ## Get rates
 ```js
-client.get_rates('BTC_USD', <store_id>).then(rates => console.log(rates))
+client.get_rates('BTC_USD').then(rates => console.log(rates))
 ```
 
 The first argument accept comma-separated list of currency pair.

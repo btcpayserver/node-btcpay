@@ -112,16 +112,10 @@ BTCPayClient.prototype._unsigned_request = function (path, payload) {
     }
 }
 
-
-BTCPayClient.prototype.get_rates = function (currencyPairs, store_id) {
-    let _params = {cryptoCode: crypto}
-    
-    _params['storeID'] = store_id
-    _params['currencyPairs'] = currencyPairs
-    
+BTCPayClient.prototype.get_rates = function (currencyPairs) {
+    let _params = {currencyPairs: currencyPairs}
     return this._signed_get_request('/rates', _params)
 }
-
 
 BTCPayClient.prototype.create_invoice = function (payload, token) {
     let re = new RegExp('^[A-Z]{3,3}$')
