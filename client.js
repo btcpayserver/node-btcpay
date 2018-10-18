@@ -1,5 +1,4 @@
 let _ = require('underscore')
-let Promise = require('bluebird')
 let crypto = require('./cryptography')
 let qs = require('querystring')
 let rp = require('request-promise')
