@@ -10,7 +10,6 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.1",
-    "bn.js": "^4.11.8",
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
     "request": "^2.85.0",
