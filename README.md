@@ -26,7 +26,7 @@ After generating your private key, you have to pair your client with your BTCPay
 ```js
 const btcpay = require('btcpay')
 const keypair = btcpay.crypto.load_keypair(new Buffer.from(<PRIVATEKEY>, 'hex'))
-const client = new btcpay.BTCPayClient(<BTCPAYURL>, btcpay.crypto.load_keypair(Buffer.from(<PRIVATEKEY>, 'hex')))
+const client = new btcpay.BTCPayClient(<BTCPAYURL>, keypair)
 
 // Pair client to server
 client
