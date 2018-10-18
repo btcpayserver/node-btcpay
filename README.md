@@ -5,58 +5,68 @@
 npm install https://github.com/tanjalo/node-btcpay
 ```
 
-
-## Pairing
+## Private key generation
 * Generate and save private key:
 ```js
-let btcpay = require('btcpay')
-var keypair = btcpay.crypto.generate_keypair()
+const btcpay = require('btcpay')
+const keypair = btcpay.crypto.generate_keypair()
+
+>>> <Key priv: XXXXXXX pub: null >
 ```
-* Create client:
-```js
-var client = new btcpay.BTCPayClient('https://btcpayserverhostname', keypair)
-```
+
+Store the value of "priv" in a save place, e.g. environment variables
+
+## Pairing
+
+After generating your private key, you have to pair your client with your BTCPay store:
+
 * On BTCPay Server > Stores > Settings > Access Tokens > Create a new token, (leave PublicKey blank) > Request pairing
 * Copy pairing code:
 * Pair client to server and save returned token:
 ```js
-client.pair_client(<pairing-code>).then(res => console.log(res))
->>> { merchant: '6gi59fB1LKxHuyY29m8tR6tRysWppk9TnuoM7wT77Las' }
+const btcpay = require('btcpay')
+const keypair = btcpay.crypto.load_keypair(new Buffer.from(<PRIVATEKEY>, 'hex'))
+const client = new btcpay.BTCPayClient(<BTCPAYURL>, btcpay.crypto.load_keypair(Buffer.from(<PRIVATEKEY>, 'hex')))
+
+// Pair client to server
+client
+  .pair_client(<PAIRINGCODE>)
+  .then(res => console.log(res))
+  .catch(err => console.log(err))
+
+>>> { merchant: 'XXXXXX' }
 ```
-* Recreate client:
+Store the value of "merchant" in a save place, e.g. environment variables
+
+## Recreating a client
+After pairing your client to the store, you can recreate the client as needed and use it in your code
 ```js
-var client = new btcpay.BTCPayClient('https://btcpayserverhostname', keypair, {merchant: '6gi59fB1LKxHuyY29m8tR6tRysWppk9TnuoM7wT77Las'})
-```
+const btcpay = require('btcpay')
+const keypair = btcpay.crypto.load_keypair(new Buffer.from(<PRIVATEKEY>, 'hex'))
 
-
-## Creating a client
-```js
-var client = new btcpay.BTCPayClient('https://btcpayserverhostname', keypair, {merchant: '6gi59fB1LKxHuyY29m8tR6tRysWppk9TnuoM7wT77Las'})
-```
-
-
-## Get rates
-```js
-client.get_rates('BTC_USD').then(rates => console.log(rates))
-```
-
-The first argument accept comma-separated list of currency pair.
-
-## Create invoice
-See BitPay API documentation: https://bitpay.com/api#resource-Invoices
-```js
-client.create_invoice({"price": 20, "currency": "USD"}).then(invoice => console.log(invoice.url))
+// Recreate client
+const client = new btcpay.BTCPayClient(<BCTPAYURL>, keypair, {merchant: <MERCHANT>})
 ```
 
-
-## Get invoice
+### Get rates
+Fetches current rates from BitcoinAverage (using your BTCPayServer)
 ```js
-client.get_invoice(<invoice-id>).then(invoice => console.log(invoice.status))
+client.get_rates('BTC_USD')
+  .then(rates => console.log(rates))
+  .catch(err => console.log(err))
 ```
 
-
-## Key Management
-Load the keypair in your app after generating your privateKey
+### Create invoice
+See [BitPay Invoice API documentation](https://bitpay.com/api#resource-Invoices)
 ```js
-const keypair = btcpay.crypto.load_keypair(new Buffer.from(<privateKey>, 'hex'))
+client.create_invoice({price: 20, currency: 'USD'})
+  .then(invoice => console.log(invoice.url))
+  .catch(err => console.log(err))
+```
+
+### Get invoice
+```js
+client.get_invoice(<invoice-id>)
+  .then(invoice => console.log(invoice.status))
+  .catch(err => console.log(err))
 ```
