@@ -10,6 +10,7 @@ npm install https://github.com/tanjalo/node-btcpay
 ```js
 const btcpay = require('btcpay')
 const keypair = btcpay.crypto.generate_keypair()
+console.log(keypair)
 
 >>> <Key priv: XXXXXXX pub: null >
 ```
