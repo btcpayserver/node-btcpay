@@ -56,7 +56,7 @@ client.get_invoice(<invoice-id>).then(invoice => console.log(invoice.status))
 
 
 ## Key Management
+Load the keypair in your app after generating your privateKey
 ```js
-var privateKey = keypair.getPrivate().toString('hex')
-var keypair = btcpay.crypto.load_keypair(new Buffer(privateKey, "hex"))
+const keypair = btcpay.crypto.load_keypair(new Buffer.from(<privateKey>, 'hex'))
 ```
