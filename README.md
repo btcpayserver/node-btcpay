@@ -52,10 +52,11 @@ const client = new btcpay.BTCPayClient(<BCTPAYURL>, keypair, {merchant: <MERCHAN
 ### Get rates
 Fetches current rates from BitcoinAverage (using your BTCPayServer)
 ```js
-client.get_rates('BTC_USD')
+client.get_rates('BTC_USD', <STOREID>)
   .then(rates => console.log(rates))
   .catch(err => console.log(err))
 ```
+The first argument accepts a comma-separated list of currency pair.
 
 ### Create invoice
 See [BitPay Invoice API documentation](https://bitpay.com/api#resource-Invoices)

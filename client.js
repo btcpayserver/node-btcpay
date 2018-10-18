@@ -111,8 +111,8 @@ BTCPayClient.prototype._unsigned_request = function (path, payload) {
     }
 }
 
-BTCPayClient.prototype.get_rates = function (currencyPairs) {
-    let _params = {currencyPairs: currencyPairs}
+BTCPayClient.prototype.get_rates = function (currencyPairs, storeID) {
+    let _params = {currencyPairs, storeID}
     return this._signed_get_request('/rates', _params)
 }
 
