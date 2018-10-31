@@ -2,7 +2,6 @@ let crypto = require('crypto')
 let EC = require('elliptic').ec,
     ec = new EC('secp256k1');
 let bs58 = require('bs58')
-const BN = require('bn.js')
 
 let generate_keypair = function () {
     let kp = ec.genKeyPair()
