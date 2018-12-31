@@ -2,15 +2,13 @@
 
 ## Install
 ```shell
-npm install https://github.com/tanjalo/node-btcpay
+npm install btcpayserver/node-btcpay
 ```
 
 ## Private key generation
 * Generate and save private key:
-```js
-const btcpay = require('btcpay')
-const keypair = btcpay.crypto.generate_keypair()
-console.log(keypair)
+```bash
+$ node -p "require('btcpay').crypto.generate_keypair()"
 
 >>> <Key priv: XXXXXXX pub: null >
 ```
@@ -24,19 +22,17 @@ After generating your private key, you have to pair your client with your BTCPay
 * On BTCPay Server > Stores > Settings > Access Tokens > Create a new token, (leave PublicKey blank) > Request pairing
 * Copy pairing code:
 * Pair client to server and save returned token:
-```js
-const btcpay = require('btcpay')
-const keypair = btcpay.crypto.load_keypair(new Buffer.from(<PRIVATEKEY>, 'hex'))
-const client = new btcpay.BTCPayClient(<BTCPAYURL>, keypair)
 
-// Pair client to server
-client
-  .pair_client(<PAIRINGCODE>)
-  .then(res => console.log(res))
-  .catch(err => console.log(err))
+```bash
+# Replace the BTCPAY_XXX envirnoment variables with your values and run:
+
+$ [space] BTCPAY_URL=https://mydomain.com/ BTCPAY_KEY=... BTCPAY_PAIRCODE=... node -e "const btcpay=require('btcpay'); new btcpay.BTCPayClient(process.env.BTCPAY_URL, btcpay.crypto.load_keypair(Buffer.from(process.env.BTCPAY_KEY, 'hex'))).pair_client(process.env.BTCPAY_PAIRCODE).then(console.log).catch(console.error)"
+
+# (prepend the line with a space to prevent BTCPAY_KEY from being saved to your bash history)
 
 >>> { merchant: 'XXXXXX' }
 ```
+
 Store the value of "merchant" in a save place, e.g. environment variables
 
 ## Recreating a client
