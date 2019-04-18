@@ -44,11 +44,11 @@ BTCPayClient.prototype._signed_get_request = function (path, params, token) {
     _options['qs'] = _params
 
     return rp.get(_options).then(resp => {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             resolve(resp['data'])
         })
     }).catch(err => {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             reject(err)
         })
     })
@@ -112,7 +112,10 @@ BTCPayClient.prototype._unsigned_request = function (path, payload) {
 }
 
 BTCPayClient.prototype.get_rates = function (currencyPairs, storeID) {
-    let _params = {currencyPairs, storeID}
+    let _params = {
+        currencyPairs,
+        storeID
+    }
     return this._signed_get_request('/rates', _params)
 }
 
@@ -135,6 +138,10 @@ BTCPayClient.prototype.get_invoice = function (invoice_id, token) {
     return this._signed_get_request('/invoices/' + invoice_id, token)
 }
 
+BTCPayClient.prototype.get_invoices = function (params, token) {
+    return this._signed_get_request('/invoices', params, token)
+}
+
 
 BTCPayClient.prototype.pair_client = function (code) {
     let re = new RegExp('^\\w{7,7}$')
@@ -143,7 +150,10 @@ BTCPayClient.prototype.pair_client = function (code) {
         throw 'pairing code is not valid'
     }
 
-    let payload = {id: this.client_id, pairingCode: code}
+    let payload = {
+        id: this.client_id,
+        pairingCode: code
+    }
 
     return this._unsigned_request('/tokens', payload).then(data => {
         let _data = data[0]
