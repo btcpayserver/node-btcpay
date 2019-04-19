@@ -1,5 +1,4 @@
-import * as cryptography from './core/cryptography';
-import * as BTCPayClient from './core/client';
+import { Cryptography } from './core/cryptography';
+import { BTCPayClient } from './core/client';
 
-exports.crypto = cryptography.Cryptography;
-exports.BTCPayClient = BTCPayClient.BTCPayClient;
+export { Cryptography as crypto, BTCPayClient };
