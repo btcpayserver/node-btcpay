@@ -1,5 +1,5 @@
-let crypto = require('./cryptography')
-let BTCPayClient = require('./client')
+const crypto = require('./cryptography');
+const BTCPayClient = require('./client');
 
-exports.crypto = crypto
-exports.BTCPayClient = BTCPayClient
+exports.crypto = crypto;
+exports.BTCPayClient = BTCPayClient;
