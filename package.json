@@ -1,14 +1,19 @@
 {
   "name": "btcpay",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A nodejs client implementation for BTCPay",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Tim Akinbo <tim@tanjalo.com>",
+  "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
   "dependencies": {
+    "@types/bs58": "^4.0.0",
+    "@types/elliptic": "^6.4.6",
+    "@types/node": "^11.13.5",
+    "@types/request": "^2.48.1",
+    "@types/underscore": "^1.8.14",
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
     "request": "^2.85.0",
@@ -16,6 +21,7 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "eslint": "^5.16.0"
+    "eslint": "^5.16.0",
+    "typescript": "^3.4.4"
   }
 }
