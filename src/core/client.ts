@@ -1,5 +1,5 @@
 import { Cryptography as crypto } from './cryptography';
-import * as rp from 'request';
+import * as rp from 'request-promise';
 import * as _ from 'underscore';
 import * as qs from 'querystring';
 import * as elliptic from 'elliptic';

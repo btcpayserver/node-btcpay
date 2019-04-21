@@ -1,10 +1,20 @@
 import * as btcpay from '../dist';
+import { METHODS } from 'http';
 
 const keypair = btcpay.crypto.load_keypair(Buffer.from('', 'hex'));
 
-const client = new btcpay.BTCPayClient('', keypair, { merchant: '' });
+const client = new btcpay.BTCPayClient('', keypair, {
+  merchant: ''
+});
 
-client
-  .get_rates('BTC_USD', '')
-  .then((rates) => console.log(rates))
-  .catch((err) => console.log(err));
+async function test() {
+  console.log('GO');
+  try {
+    const rates = await client.get_rates('BTC_EUR', '');
+    console.log(JSON.stringify(rates));
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+test();

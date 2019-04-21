@@ -14,11 +14,12 @@
     "@types/elliptic": "^6.4.6",
     "@types/node": "^11.13.5",
     "@types/request": "^2.48.1",
+    "@types/request-promise": "^4.1.42",
     "@types/underscore": "^1.8.14",
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
     "request": "^2.85.0",
-    "request-promise": "^4.2.2",
+    "request-promise": "^4.2.4",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
