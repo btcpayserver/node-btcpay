@@ -8,7 +8,6 @@ const client = new btcpay.BTCPayClient('', keypair, {
 });
 
 async function test() {
-  console.log('GO');
   try {
     const rates = await client.get_rates('BTC_EUR', '');
     console.log(JSON.stringify(rates));

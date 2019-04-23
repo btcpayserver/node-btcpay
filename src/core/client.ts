@@ -6,14 +6,7 @@ import * as elliptic from 'elliptic';
 import { Invoice } from '../models/invoice';
 import { Rate } from '../models/rate';
 
-export interface IBTCPayClient {
-  get_rates(currencyPairs, storeID): Promise<Rate[]>;
-  create_invoice(payload: any, token?: any): Promise<Invoice>;
-  get_invoice(invoice_id: string, token?: any): Promise<Invoice[]>;
-  get_invoices(params: any, token?: any): Promise<Invoice[]>;
-}
-
-export class BTCPayClient implements IBTCPayClient {
+export class BTCPayClient {
   private host: string;
   private kp: elliptic.ec.KeyPair;
   private tokens: any;
