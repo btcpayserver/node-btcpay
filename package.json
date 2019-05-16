@@ -2,7 +2,7 @@
   "name": "btcpay",
   "version": "0.2.0",
   "description": "A nodejs client implementation for BTCPay",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
