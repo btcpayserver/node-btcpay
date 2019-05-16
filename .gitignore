@@ -57,3 +57,5 @@ yarn-error.log*
 #######
 .vscode
 .idea
+
+dist/
