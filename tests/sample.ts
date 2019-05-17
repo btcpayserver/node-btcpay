@@ -4,7 +4,7 @@ import { METHODS } from 'http';
 const keypair = btcpay.crypto.load_keypair(Buffer.from('', 'hex'));
 
 const client = new btcpay.BTCPayClient('', keypair, {
-  merchant: ''
+  merchant: '',
 });
 
 async function test() {

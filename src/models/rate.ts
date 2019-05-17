@@ -1,1 +1,5 @@
-export interface Rate {}
+export interface Rate {
+  code: string;
+  name: string;
+  rate: number;
+}

@@ -5,5 +5,5 @@ const client = new btcpay.BTCPayClient('', keypair, { merchant: '' });
 
 client
   .get_rates('BTC_USD', '')
-  .then((rates) => console.log(rates))
-  .catch((err) => console.log(err));
+  .then(rates => console.log(rates))
+  .catch(err => console.log(err));

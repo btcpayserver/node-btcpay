@@ -10,27 +10,28 @@ export class BTCPayClient {
   private host: string;
   private kp: elliptic.ec.KeyPair;
   private tokens: any;
-  private client_id: string;
-  private user_agent: string;
+  private clientId: string;
+  private userAgent: string;
   private options: any;
 
   constructor(host: string, keypair: elliptic.ec.KeyPair, tokens: any) {
     this.host = host;
     this.kp = keypair;
-    this.tokens = tokens == undefined ? {} : tokens;
-    this.client_id = crypto.get_sin_from_key(keypair);
-    this.user_agent = 'node-btcpay';
+    this.tokens = tokens === undefined ? {} : tokens;
+    this.clientId = crypto.get_sin_from_key(keypair);
+    this.userAgent = 'node-btcpay';
     this.options = {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-Accept-Version': '2.0.0'
+        'User-Agent': this.userAgent,
+        'X-Accept-Version': '2.0.0',
       },
-      json: true
+      json: true,
     };
   }
 
-  public async pair_client(code) {
+  public async pair_client(code: string): Promise<any> {
     const re = new RegExp('^\\w{7,7}$');
 
     if (!re.test(code)) {
@@ -38,14 +39,14 @@ export class BTCPayClient {
     }
 
     const payload = {
-      id: this.client_id,
-      pairingCode: code
+      id: this.clientId,
+      pairingCode: code,
     };
 
     try {
       const data = await this.unsigned_request('/tokens', payload);
       const _data = data[0];
-      const _res = {};
+      const _res: any = {};
       _res[_data.facade] = _data.token;
       return _res;
     } catch (error) {
@@ -53,10 +54,13 @@ export class BTCPayClient {
     }
   }
 
-  public async get_rates(currencyPairs, storeID): Promise<Rate[]> {
+  public async get_rates(
+    currencyPairs: string[],
+    storeID: string,
+  ): Promise<Rate[]> {
     const _params = {
       currencyPairs,
-      storeID
+      storeID,
     };
 
     return this.signed_get_request('/rates', _params);
@@ -73,14 +77,13 @@ export class BTCPayClient {
       throw 'Price must be a float';
     }
 
-    return this.signed_post_request('/invoices', payload, token) as Invoice;
+    return this.signed_post_request('/invoices', payload, token) as Promise<
+      Invoice
+    >;
   }
 
-  public async get_invoice(
-    invoice_id: string,
-    token?: any
-  ): Promise<Invoice[]> {
-    return this.signed_get_request('/invoices/' + invoice_id, token);
+  public async get_invoice(invoiceId: string, token?: any): Promise<Invoice[]> {
+    return this.signed_get_request('/invoices/' + invoiceId, token);
   }
 
   public async get_invoices(params: any, token?: any): Promise<Invoice[]> {
@@ -90,16 +93,16 @@ export class BTCPayClient {
   private create_signed_headers(uri: string, payload: string) {
     return {
       'X-Identity': Buffer.from(
-        this.kp.getPublic().encodeCompressed()
+        this.kp.getPublic().encodeCompressed(),
       ).toString('hex'),
-      'X-Signature': crypto.sign(uri + payload, this.kp).toString('hex')
+      'X-Signature': crypto.sign(uri + payload, this.kp).toString('hex'),
     };
   }
 
   private async signed_get_request(
     path: string,
     params: any,
-    token?: any
+    token?: any,
   ): Promise<any> {
     const _token = token ? token : _.values(this.tokens)[0];
     const _params = params ? params : {};
@@ -124,7 +127,7 @@ export class BTCPayClient {
   private async signed_post_request(
     path: string,
     payload: any,
-    token: any
+    token: any,
   ): Promise<any> {
     const _token = token ? token : _.values(this.tokens)[0];
     payload['token'] = _token;

@@ -2,20 +2,23 @@
   "name": "btcpay",
   "version": "0.2.0",
   "description": "A nodejs client implementation for BTCPay",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "rimraf dist && tsc -p ./tsconfig.json",
+    "format": "npm run prettier -- --write",
+    "format:ci": "npm run prettier -- --check",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "prepare": "npm run build",
+    "prettier": "prettier 'src/**/*.ts' --single-quote --trailing-comma all",
+    "test": "npm run format:ci && npm run lint && echo \"###!!!Warning!!!### No tests exist! We ONLY checked formatting and linting!\""
   },
   "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
   "dependencies": {
-    "@types/bs58": "^4.0.0",
-    "@types/elliptic": "^6.4.6",
-    "@types/node": "^11.13.5",
-    "@types/request": "^2.48.1",
-    "@types/request-promise": "^4.1.42",
-    "@types/underscore": "^1.8.14",
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
     "request": "^2.85.0",
@@ -23,8 +26,17 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
+    "@types/bs58": "^4.0.0",
+    "@types/elliptic": "^6.4.6",
+    "@types/node": "^11.13.5",
+    "@types/request": "^2.48.1",
+    "@types/request-promise": "^4.1.42",
+    "@types/underscore": "^1.8.14",
     "eslint": "^5.16.0",
+    "prettier": "^1.17.1",
+    "rimraf": "^2.6.3",
     "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
     "typescript": "^3.4.4"
   }
 }

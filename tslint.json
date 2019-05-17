@@ -11,7 +11,6 @@
     "interface-name": false,
     "jsdoc-format": true,
     "label-position": true,
-    "label-undefined": true,
     "max-line-length": [false, 140],
     "member-ordering": [
       false,
@@ -26,7 +25,6 @@
     "no-construct": true,
     "no-constructor-vars": false,
     "no-debugger": false,
-    "no-duplicate-key": true,
     "no-shadowed-variable": false,
     "no-duplicate-variable": true,
     "no-empty": false,
@@ -34,11 +32,8 @@
     "no-require-imports": true,
     "no-string-literal": false,
     "no-switch-case-fall-through": false,
-    "no-trailing-comma": true,
     "no-trailing-whitespace": true,
-    "no-unreachable": true,
     "no-unused-expression": false,
-    "no-unused-variable": true,
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-var-requires": false,
@@ -72,7 +67,6 @@
         "variable-declaration": "nospace"
       }
     ],
-    "use-strict": [true, "check-module", "check-function"],
     "variable-name": [true, "allow-leading-underscore"],
     "whitespace": [
       false,
