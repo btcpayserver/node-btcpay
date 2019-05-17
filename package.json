@@ -14,7 +14,7 @@
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "prepare": "npm run build",
     "prettier": "prettier 'src/**/*.ts' --single-quote --trailing-comma all",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run format:ci && npm run lint && echo \"###!!!Warning!!!### No tests exist! We ONLY checked formatting and linting!\""
   },
   "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
