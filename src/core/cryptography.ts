@@ -11,14 +11,14 @@ export class Cryptography {
   }
 
   public static load_keypair(
-    buf: Buffer | string | elliptic.ec.KeyPair
+    buf: Buffer | string | elliptic.ec.KeyPair,
   ): elliptic.ec.KeyPair {
     return ec.keyFromPrivate(buf);
   }
 
   public static get_sin_from_key(kp: elliptic.ec.KeyPair): string {
     const pk: crypto.BinaryLike = Buffer.from(
-      kp.getPublic().encodeCompressed()
+      kp.getPublic().encodeCompressed(),
     );
     const version: Buffer = Cryptography.get_version_from_compressed_key(pk);
     const checksum: Buffer = Cryptography.get_checksum_from_version(version);
@@ -27,7 +27,7 @@ export class Cryptography {
 
   public static sign(
     message: crypto.BinaryLike,
-    kp: elliptic.ec.KeyPair
+    kp: elliptic.ec.KeyPair,
   ): Buffer {
     const digest = crypto
       .createHash('sha256')
@@ -37,7 +37,7 @@ export class Cryptography {
   }
 
   private static get_version_from_compressed_key(
-    pk: crypto.BinaryLike
+    pk: crypto.BinaryLike,
   ): Buffer {
     const sh2 = crypto
       .createHash('sha256')
@@ -51,7 +51,7 @@ export class Cryptography {
     return Buffer.concat([
       Buffer.from('0F', 'hex'),
       Buffer.from('02', 'hex'),
-      rp
+      rp,
     ]);
   }
 
