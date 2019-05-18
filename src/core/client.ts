@@ -1,24 +1,22 @@
-import { Cryptography as crypto } from './cryptography';
+import * as elliptic from 'elliptic';
+import * as qs from 'querystring';
 import * as rp from 'request-promise';
 import * as _ from 'underscore';
-import * as qs from 'querystring';
-import * as elliptic from 'elliptic';
+import { Cryptography as crypto } from './cryptography';
 import { Invoice } from '../models/invoice';
 import { Rate } from '../models/rate';
 
 export class BTCPayClient {
-  private host: string;
-  private kp: elliptic.ec.KeyPair;
-  private tokens: any;
   private clientId: string;
   private userAgent: string;
   private options: any;
 
-  constructor(host: string, keypair: elliptic.ec.KeyPair, tokens: any) {
-    this.host = host;
-    this.kp = keypair;
-    this.tokens = tokens === undefined ? {} : tokens;
-    this.clientId = crypto.get_sin_from_key(keypair);
+  constructor(
+    private host: string,
+    private kp: elliptic.ec.KeyPair,
+    private tokens: any = {},
+  ) {
+    this.clientId = crypto.get_sin_from_key(this.kp);
     this.userAgent = 'node-btcpay';
     this.options = {
       headers: {
@@ -43,37 +41,32 @@ export class BTCPayClient {
       pairingCode: code,
     };
 
-    try {
-      const data = await this.unsigned_request('/tokens', payload);
+    return this.unsigned_request('/tokens', payload).then((data: any) => {
       const _data = data[0];
       const _res: any = {};
       _res[_data.facade] = _data.token;
       return _res;
-    } catch (error) {
-      throw error;
-    }
+    });
   }
 
   public async get_rates(
     currencyPairs: string[],
     storeID: string,
   ): Promise<Rate[]> {
-    const _params = {
+    return this.signed_get_request('/rates', {
       currencyPairs,
       storeID,
-    };
-
-    return this.signed_get_request('/rates', _params);
+    });
   }
 
   public async create_invoice(payload: any, token?: any): Promise<Invoice> {
     const re = new RegExp('^[A-Z]{3,3}$');
 
-    if (!re.test(payload['currency'])) {
+    if (!re.test(payload.currency)) {
       throw 'Currency is invalid';
     }
 
-    if (isNaN(parseFloat(payload['price']))) {
+    if (isNaN(parseFloat(payload.price))) {
       throw 'Price must be a float';
     }
 
@@ -101,76 +94,52 @@ export class BTCPayClient {
 
   private async signed_get_request(
     path: string,
-    params: any,
-    token?: any,
+    params: any = {},
+    token: any = _.values(this.tokens)[0],
   ): Promise<any> {
-    const _token = token ? token : _.values(this.tokens)[0];
-    const _params = params ? params : {};
-    _params['token'] = _token;
+    params.token = token;
 
-    const _uri = this.host + path;
-    const _payload = '?' + qs.stringify(_params);
     const _options = JSON.parse(JSON.stringify(this.options));
 
-    _.extend(_options.headers, this.create_signed_headers(_uri, _payload));
-    _options['uri'] = _uri;
-    _options['qs'] = _params;
+    const _uri = this.host + path;
+    const _payload = '?' + qs.stringify(params);
 
-    try {
-      const resp = await rp.get(_options);
-      return resp['data'];
-    } catch (err) {
-      throw err;
-    }
+    _.extend(_options.headers, this.create_signed_headers(_uri, _payload));
+    _options.uri = _uri;
+    _options.qs = params;
+
+    return rp.get(_options).then((resp: any) => resp.data);
   }
 
   private async signed_post_request(
     path: string,
-    payload: any,
-    token: any,
+    payload: any = {},
+    token: any = _.values(this.tokens)[0],
   ): Promise<any> {
-    const _token = token ? token : _.values(this.tokens)[0];
-    payload['token'] = _token;
+    payload.token = token;
 
     const _uri = this.host + path;
     const _payload = JSON.stringify(payload);
     const _options = JSON.parse(JSON.stringify(this.options));
 
     _.extend(_options.headers, this.create_signed_headers(_uri, _payload));
-    _options['uri'] = _uri;
-    _options['body'] = payload;
+    _options.uri = _uri;
+    _options.body = payload;
 
-    try {
-      const resp = await rp.post(_options);
-      return resp['data'];
-    } catch (err) {
-      throw err;
-    }
+    return rp.post(_options).then((resp: any) => resp.data);
   }
 
-  private async unsigned_request(path: string, payload: any): Promise<any> {
-    const _uri = this.host + path;
-    const _options = JSON.parse(JSON.stringify(this.options));
+  private async unsigned_request(path: string, payload?: any): Promise<any> {
+    const hasPayload = payload !== undefined;
 
-    if (payload) {
-      _options['uri'] = _uri;
-      _options['body'] = payload;
+    const _mixin: any = {
+      method: hasPayload ? 'POST' : 'GET',
+      uri: this.host + path,
+      ...(hasPayload ? { body: payload } : undefined),
+    };
 
-      try {
-        const resp = await rp.post(_options);
-        return resp['data'];
-      } catch (err) {
-        throw err;
-      }
-    } else {
-      _options['uri'] = _uri;
+    const _options = { ...JSON.parse(JSON.stringify(this.options)), ..._mixin };
 
-      try {
-        const resp = await rp.get(_options);
-        return resp['data'];
-      } catch (err) {
-        throw err;
-      }
-    }
+    return rp(_options).then((resp: any) => resp.data);
   }
 }

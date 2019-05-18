@@ -9,7 +9,7 @@
     "esModuleInterop": false
   },
   "lib": [
-    "es2015",
+    "es2017",
     "node"
   ],
   "include": [
