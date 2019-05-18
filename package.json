@@ -18,6 +18,10 @@
   },
   "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/btcpayserver/node-btcpay.git"
+  },
   "dependencies": {
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
