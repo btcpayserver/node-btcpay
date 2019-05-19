@@ -1,4 +1,5 @@
 import * as elliptic from 'elliptic';
+import * as puppeteer from 'puppeteer';
 import { BTCPayClient } from '../../src/core/client';
 import { Cryptography as myCrypto } from '../../src/core/cryptography';
 
@@ -18,20 +19,76 @@ const TOKENS = {
 
 const INVOICE_ID = 'TRnwXeAkuLQihe22mJs7J4';
 
-// We need a way to programmatically get a new pairing code...
-const SERVER_PAIRING_CODE = 'apYAxP9';
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const loginAndGetPairingCode = async (): Promise<any> => {
+  const newTokenName = 'autotest ' + new Date().getTime();
+
+  const browser = await puppeteer.launch({ headless: true });
+  const page = (await browser.pages())[0];
+  await page.goto('https://testnet.demo.btcpayserver.org/Account/Login');
+
+  await page.type('#Email', USER_NAME);
+  await page.type('#Password', PASSWORD);
+  await page.click('#LoginButton');
+  await page.goto(
+    'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
+      'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens/Create',
+  );
+  await page.type('#Label', newTokenName);
+  await page.click('[type="submit"]');
+  await sleep(600);
+  await page.click('[type="submit"]');
+  await sleep(600);
+  const contents = await page.$eval(
+    'div.alert.alert-success.alert-dismissible',
+    el => el.innerHTML,
+  );
+  const pairingCode = (contents.match(
+    /Server initiated pairing code: (\S{7})/,
+  ) || [])[1];
+  if (!pairingCode) throw new Error('Could not get pairing code');
+  return {
+    browser,
+    page,
+    pairingCode,
+  };
+};
+
+const deleteTokenAndClose = async (
+  browser: puppeteer.Browser,
+  page: puppeteer.Page,
+) => {
+  await page.goto(
+    'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
+      'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens',
+  );
+  const link = await page.$eval(
+    'table.table.table-sm.table-responsive-md',
+    el =>
+      el.children[1].children[1].children[1].children[1].attributes[0]
+        .nodeValue,
+  );
+  await page.goto('https://testnet.demo.btcpayserver.org' + link);
+  await sleep(600);
+  await page.click('[type="submit"]');
+  await sleep(100);
+  browser.close();
+};
 
 let MY_KEYPAIR: elliptic.ec.KeyPair;
 let client: BTCPayClient;
-describe('btcpay.core.cryptography', () => {
+describe('btcpay.core.client', () => {
   beforeAll(() => {
+    jest.setTimeout(20000); // browser takes a while
     MY_KEYPAIR = myCrypto.load_keypair(MY_PRIVATE_KEY);
     client = new BTCPayClient(URL, MY_KEYPAIR, TOKENS);
   });
 
   it('should pair with server', async () => {
+    const pairingData = await loginAndGetPairingCode();
     const myClient = new BTCPayClient(URL, MY_KEYPAIR);
-    const result = await myClient.pair_client(SERVER_PAIRING_CODE).then(
+    const result = await myClient.pair_client(pairingData.pairingCode).then(
       v => v,
       async err => {
         if (
@@ -44,6 +101,7 @@ describe('btcpay.core.cryptography', () => {
       },
     );
     expect(result.merchant).toBeDefined();
+    await deleteTokenAndClose(pairingData.browser, pairingData.page);
     await expect(myClient.pair_client('hduheufhfuf')).rejects.toThrow(
       /^pairing code is not valid$/,
     );
