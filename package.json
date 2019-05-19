@@ -9,12 +9,14 @@
   ],
   "scripts": {
     "build": "rimraf dist && tsc -p ./tsconfig.json",
+    "coverage": "npm run unit -- --coverage",
     "format": "npm run prettier -- --write",
     "format:ci": "npm run prettier -- --check",
     "lint": "tslint -p tsconfig.json -c tslint.json",
     "prepare": "npm run build",
-    "prettier": "prettier 'src/**/*.ts' --single-quote --trailing-comma all",
-    "test": "npm run format:ci && npm run lint && echo \"###!!!Warning!!!### No tests exist! We ONLY checked formatting and linting!\""
+    "prettier": "prettier 'src/**/*.ts' 'tests/**/*.spec.ts' --single-quote --trailing-comma all",
+    "test": "npm run format:ci && npm run lint && npm run coverage",
+    "unit": "jest --config=jest.json --runInBand"
   },
   "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
@@ -32,13 +34,16 @@
   "devDependencies": {
     "@types/bs58": "^4.0.0",
     "@types/elliptic": "^6.4.6",
+    "@types/jest": "^24.0.13",
     "@types/node": "^11.13.5",
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.42",
     "@types/underscore": "^1.8.14",
     "eslint": "^5.16.0",
+    "jest": "^24.8.0",
     "prettier": "^1.17.1",
     "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "typescript": "^3.4.4"

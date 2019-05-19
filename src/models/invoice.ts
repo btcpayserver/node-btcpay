@@ -1,68 +1,73 @@
 export interface Invoice {
-  id: string;
-  token: string;
+  url: string;
+  posData: string | null;
+  status: string;
+  btcPrice: string;
+  btcDue: string;
+  cryptoInfo: Array<{
+    cryptoCode: string;
+    paymentType: string;
+    rate: number;
+    exRates: any[];
+    paid: string;
+    price: string;
+    due: string;
+    paymentUrls: any[];
+    address: string;
+    url: string;
+    totalDue: string;
+    networkFee: string;
+    txCount: number;
+    cryptoPaid: string;
+    payments: any[];
+  }>;
   price: number;
   currency: string;
-  orderId: string;
-  orderID?: string;
-  itemDesc: string;
-  itemCode: string;
-  notificationEmail: string;
-  notificationURL: string;
-  redirectURL: string;
-  paymentUrls?: any;
-  paymentCodes: any;
-  posData: string;
-  transactionSpeed: string;
-  fullNotifications: boolean;
-  extendedNotifications: boolean;
-  physical: boolean;
-  buyer: {
-    name: string;
-    address1: string;
-    address2: string;
-    locality: string;
-    region: string;
-    postalCode: string;
-    country: string;
-    email: string;
-    phone: string;
-    notify: boolean;
-  };
-  url: string;
-  status: string;
-  btcPaid?: number;
-  amountPaid: number;
-  btcPrice?: number;
-  paymentSubtotals: any;
-  btcDue?: number;
-  paymentTotals: any;
-  minerFees: any;
+  exRates: any;
+  buyerTotalBtcAmount: string | null;
+  itemDesc: string | null;
+  itemCode: string | null;
+  orderId: string | null;
+  guid: string;
+  id: string;
   invoiceTime: number;
   expirationTime: number;
-  currentTime: string; // 'date' === string?
-  exceptionStatus: string | boolean;
-  rate?: number;
-  exRates?: any;
-  exchangeRates: any;
-  transactions: Array<{
-    amount: number;
-    confirmations: number;
-    time: string; // 'date' === string?
-    receivedTime: string; // 'date' === string?
-  }>;
-  flags?: {
-    refundable: string;
+  currentTime: number;
+  lowFeeDetected: boolean;
+  btcPaid: string;
+  rate: number;
+  exceptionStatus: boolean;
+  paymentUrls: {
+    BIP21: string | null;
+    BIP72: string | null;
+    BIP72b: string | null;
+    BIP73: string | null;
+    BOLT11: string | null;
   };
-  creditedOverpaymentAmounts: any;
-  refundInfo: Array<{
-    supportRequest: string;
-    currency: string;
-    amounts: any;
-  }>;
-  transactionCurrency: string;
+  refundAddressRequestPending: boolean;
+  buyerPaidBtcMinerFee: string | null;
+  bitcoinAddress: string;
+  token: string;
+  flags: {
+    refundable: boolean;
+  };
+  paymentSubtotals: any;
+  paymentTotals: any;
+  amountPaid: number;
+  minerFees: any;
+  exchangeRates: any;
   supportedTransactionCurrencies: any;
-  buyerProvidedInfo: {
-    selectedTransactionCurrency: any;
+  addresses: any;
+  paymentCodes: any;
+  buyer: {
+    name: string | null;
+    address1: string | null;
+    address2: string | null;
+    locality: string | null;
+    region: string | null;
+    postalCode: string | null;
+    country: string | null;
+    phone: string | null;
+    email: string | null;
   };
 }

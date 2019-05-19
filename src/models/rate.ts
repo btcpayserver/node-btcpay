@@ -1,5 +1,7 @@
 export interface Rate {
-  code: string;
   name: string;
+  cryptoCode: string;
+  currencyPair: string;
+  code: string;
   rate: number;
 }

@@ -2,6 +2,7 @@ import * as elliptic from 'elliptic';
 import * as qs from 'querystring';
 import * as rp from 'request-promise';
 import * as _ from 'underscore';
+import { GetInvoicesArgs, PairClientResponse } from '../models/client';
 import { Cryptography as crypto } from './cryptography';
 import { Invoice } from '../models/invoice';
 import { Rate } from '../models/rate';
@@ -16,6 +17,7 @@ export class BTCPayClient {
     private kp: elliptic.ec.KeyPair,
     private tokens: any = {},
   ) {
+    this.host = this.host.replace(/\/+$/, '');
     this.clientId = crypto.get_sin_from_key(this.kp);
     this.userAgent = 'node-btcpay';
     this.options = {
@@ -29,11 +31,11 @@ export class BTCPayClient {
     };
   }
 
-  public async pair_client(code: string): Promise<any> {
-    const re = new RegExp('^\\w{7,7}$');
+  public async pair_client(code: string): Promise<PairClientResponse> {
+    const re = new RegExp('^\\w{7}$');
 
     if (!re.test(code)) {
-      throw 'pairing code is not valid';
+      throw new Error('pairing code is not valid');
     }
 
     const payload = {
@@ -54,32 +56,36 @@ export class BTCPayClient {
     storeID: string,
   ): Promise<Rate[]> {
     return this.signed_get_request('/rates', {
-      currencyPairs,
+      currencyPairs: currencyPairs.join(','),
       storeID,
     });
   }
 
-  public async create_invoice(payload: any, token?: any): Promise<Invoice> {
-    const re = new RegExp('^[A-Z]{3,3}$');
+  public async create_invoice(
+    payload: { currency: string; price: string | number },
+    token?: any,
+  ): Promise<Invoice> {
+    const re = new RegExp('^[A-Z]{3}$');
 
     if (!re.test(payload.currency)) {
-      throw 'Currency is invalid';
+      throw new Error('Currency is invalid');
     }
 
-    if (isNaN(parseFloat(payload.price))) {
-      throw 'Price must be a float';
+    if (isNaN(parseFloat(payload.price as string))) {
+      throw new Error('Price must be a float');
     }
 
-    return this.signed_post_request('/invoices', payload, token) as Promise<
-      Invoice
-    >;
+    return this.signed_post_request('/invoices', payload, token);
   }
 
-  public async get_invoice(invoiceId: string, token?: any): Promise<Invoice[]> {
+  public async get_invoice(invoiceId: string, token?: any): Promise<Invoice> {
     return this.signed_get_request('/invoices/' + invoiceId, token);
   }
 
-  public async get_invoices(params: any, token?: any): Promise<Invoice[]> {
+  public async get_invoices(
+    params?: GetInvoicesArgs,
+    token?: any,
+  ): Promise<Invoice[]> {
     return this.signed_get_request('/invoices', params, token);
   }
 
@@ -113,7 +119,7 @@ export class BTCPayClient {
 
   private async signed_post_request(
     path: string,
-    payload: any = {},
+    payload: any,
     token: any = _.values(this.tokens)[0],
   ): Promise<any> {
     payload.token = token;
@@ -129,13 +135,11 @@ export class BTCPayClient {
     return rp.post(_options).then((resp: any) => resp.data);
   }
 
-  private async unsigned_request(path: string, payload?: any): Promise<any> {
-    const hasPayload = payload !== undefined;
-
+  private async unsigned_request(path: string, payload: any): Promise<any> {
     const _mixin: any = {
-      method: hasPayload ? 'POST' : 'GET',
+      method: 'POST',
       uri: this.host + path,
-      ...(hasPayload ? { body: payload } : undefined),
+      body: payload,
     };
 
     const _options = { ...JSON.parse(JSON.stringify(this.options)), ..._mixin };
