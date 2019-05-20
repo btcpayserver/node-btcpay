@@ -14,7 +14,7 @@ const MY_PRIVATE_KEY = Buffer.from(
 
 const STORE_ID = 'HPPHFtqtsKsF3KU18fBNwVGP64hicGoRynvQrC3R2Rkw';
 const TOKENS = {
-  merchant: 'DwSMQ4SF7GAJRaMiLn4zjAR35bFJwgSpuKt9pxYoQNjJ',
+  merchant: '96ukQNT5eoNwQyRjjpgbRMvbHa6iqAJ436Zu5gRVuWxf',
 };
 
 const INVOICE_ID = 'TRnwXeAkuLQihe22mJs7J4';
@@ -63,16 +63,30 @@ const deleteTokenAndClose = async (
     'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
       'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens',
   );
-  const link = await page.$eval(
-    'table.table.table-sm.table-responsive-md',
-    el =>
-      el.children[1].children[1].children[1].children[1].attributes[0]
-        .nodeValue,
-  );
-  await page.goto('https://testnet.demo.btcpayserver.org' + link);
-  await sleep(600);
-  await page.click('[type="submit"]');
-  await sleep(100);
+
+  const link = await page.evaluate(() => {
+    const el = document.querySelector(
+      'table.table.table-sm.table-responsive-md',
+    );
+    if (el === null) return '';
+    const tbody = el.children[1];
+    if (tbody === undefined) return '';
+    const secondTr = Array.from(tbody.children).filter(tr => {
+      return tr.children[0].textContent !== 'FOR TEST (DO NOT DELETE)';
+    })[0];
+    if (secondTr !== undefined) {
+      return secondTr.children[1].children[1].attributes[0].nodeValue;
+    } else {
+      return '';
+    }
+  });
+
+  if (link !== '') {
+    await page.goto('https://testnet.demo.btcpayserver.org' + link);
+    await sleep(600);
+    await page.click('[type="submit"]');
+    await sleep(100);
+  }
   browser.close();
 };
 
