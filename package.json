@@ -1,6 +1,6 @@
 {
   "name": "btcpay",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A nodejs client implementation for BTCPay",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,6 +18,10 @@
   },
   "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/btcpayserver/node-btcpay.git"
+  },
   "dependencies": {
     "bs58": "^4.0.1",
     "elliptic": "^6.4.0",
