@@ -19,8 +19,6 @@ const TOKENS = {
 
 const INVOICE_ID = 'TRnwXeAkuLQihe22mJs7J4';
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 const loginAndGetPairingCode = async (): Promise<any> => {
   const newTokenName = 'autotest ' + new Date().getTime();
 
@@ -35,15 +33,21 @@ const loginAndGetPairingCode = async (): Promise<any> => {
     'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
       'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens/Create',
   );
+  await page.waitForSelector('input#Label');
+  await page.waitForSelector('[type="submit"]');
+
   await page.type('#Label', newTokenName);
   await page.click('[type="submit"]');
-  await sleep(600);
+  await page.waitForSelector('button[type="submit"]');
   await page.click('[type="submit"]');
-  await sleep(600);
-  const contents = await page.$eval(
-    'div.alert.alert-success.alert-dismissible',
-    el => el.innerHTML,
-  );
+  await page.waitForSelector('div.alert.alert-success.alert-dismissible');
+  const contents = await page.evaluate(() => {
+    const el = document.querySelector(
+      'div.alert.alert-success.alert-dismissible',
+    );
+    if (el === null) return '';
+    return el.innerHTML;
+  });
   const pairingCode = (contents.match(
     /Server initiated pairing code: (\S{7})/,
   ) || [])[1];
@@ -63,6 +67,7 @@ const deleteTokenAndClose = async (
     'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
       'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens',
   );
+  await page.waitForSelector('table.table.table-sm.table-responsive-md');
 
   const link = await page.evaluate(() => {
     const el = document.querySelector(
@@ -83,9 +88,9 @@ const deleteTokenAndClose = async (
 
   if (link !== '') {
     await page.goto('https://testnet.demo.btcpayserver.org' + link);
-    await sleep(600);
+    await page.waitForSelector('form > button.btn.btn-secondary.btn-danger');
     await page.click('[type="submit"]');
-    await sleep(100);
+    await page.waitForSelector('div.alert.alert-success.alert-dismissible');
   }
   browser.close();
 };
@@ -102,18 +107,7 @@ describe('btcpay.core.client', () => {
   it('should pair with server', async () => {
     const pairingData = await loginAndGetPairingCode();
     const myClient = new BTCPayClient(URL, MY_KEYPAIR);
-    const result = await myClient.pair_client(pairingData.pairingCode).then(
-      v => v,
-      async err => {
-        if (
-          err.message.match(
-            /^404 - {"error":"The specified pairingCode is not found"}$/,
-          )
-        )
-          return { merchant: 'test' };
-        throw err;
-      },
-    );
+    const result = await myClient.pair_client(pairingData.pairingCode);
     expect(result.merchant).toBeDefined();
     await deleteTokenAndClose(pairingData.browser, pairingData.page);
     await expect(myClient.pair_client('hduheufhfuf')).rejects.toThrow(
