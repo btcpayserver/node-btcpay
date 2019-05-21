@@ -3,6 +3,7 @@ import * as puppeteer from 'puppeteer';
 import { BTCPayClient } from '../../src/core/client';
 import { Cryptography as myCrypto } from '../../src/core/cryptography';
 
+const IGNORE_SANDBOX_ERROR = process.env['BTCPAY_IGNORE_SANDBOX_ERROR'];
 const USER_NAME = 'test@example.com';
 const PASSWORD = 'satoshinakamoto';
 const URL = 'https://testnet.demo.btcpayserver.org/';
@@ -22,7 +23,29 @@ const INVOICE_ID = 'TRnwXeAkuLQihe22mJs7J4';
 const loginAndGetPairingCode = async (): Promise<any> => {
   const newTokenName = 'autotest ' + new Date().getTime();
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({ headless: true }).then(
+    v => v, // if success, passthrough
+    // if error, check for env and ignore sandbox and warn.
+    err => {
+      if (IGNORE_SANDBOX_ERROR === '1') {
+        console.warn(
+          'WARNING!!! Error occurred, Chromium will be started ' +
+            "without sandbox. This won't guarantee success.",
+        );
+        return puppeteer.launch({
+          headless: true,
+          ignoreDefaultArgs: ['--disable-extensions'],
+          args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+      } else {
+        console.warn(
+          'If "No usable sandbox!" error, retry test with ' +
+            'BTCPAY_IGNORE_SANDBOX_ERROR=1',
+        );
+        throw err;
+      }
+    },
+  );
   const page = (await browser.pages())[0];
   await page.goto('https://testnet.demo.btcpayserver.org/Account/Login');
 
