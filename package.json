@@ -1,6 +1,6 @@
 {
   "name": "btcpay",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "A nodejs client implementation for BTCPay",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
