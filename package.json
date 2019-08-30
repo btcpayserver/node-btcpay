@@ -40,13 +40,11 @@
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.42",
     "@types/underscore": "^1.8.14",
-    "eslint": "^6.2.2",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "prettier": "^1.17.1",
     "puppeteer": "^1.16.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
     "typescript": "^3.4.4"
   }
