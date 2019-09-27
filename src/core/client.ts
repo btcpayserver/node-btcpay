@@ -75,7 +75,7 @@ export class BTCPayClient {
       throw new Error('Currency is invalid');
     }
 
-    if (isNaN(parseFloat(payload.price as string))) {
+    if (isNaN(parseFloat(payload.price as any))) {
       throw new Error('Price must be a float');
     }
 
