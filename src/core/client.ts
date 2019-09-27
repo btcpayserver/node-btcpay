@@ -2,7 +2,11 @@ import * as elliptic from 'elliptic';
 import * as qs from 'querystring';
 import * as rp from 'request-promise';
 import * as _ from 'underscore';
-import { GetInvoicesArgs, PairClientResponse } from '../models/client';
+import {
+  CreateInvoiceArgs,
+  GetInvoicesArgs,
+  PairClientResponse,
+} from '../models/client';
 import { Cryptography as crypto } from './cryptography';
 import { Invoice } from '../models/invoice';
 import { Rate } from '../models/rate';
@@ -62,7 +66,7 @@ export class BTCPayClient {
   }
 
   public async create_invoice(
-    payload: { currency: string; price: string | number },
+    payload: CreateInvoiceArgs,
     token?: any,
   ): Promise<Invoice> {
     const re = new RegExp('^[A-Z]{3}$');
