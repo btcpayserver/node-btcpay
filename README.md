@@ -9,9 +9,9 @@ npm install https://github.com/tanjalo/node-btcpay
 * Generate and save private key:
 ```js
 const btcpay = require('btcpay')
-const keypair = btcpay.crypto.generate_keypair()
+const privatekey = btcpay.crypto.generate_keypair().getPrivate('hex')
 
->>> <Key priv: XXXXXXX pub: null >
+console.log(`PRIVATEKEY: ${privatekey}`)
 ```
 
 Store the value of "priv" in a save place, e.g. environment variables
