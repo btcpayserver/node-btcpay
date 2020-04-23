@@ -1,61 +1,99 @@
 import * as elliptic from 'elliptic';
 import * as puppeteer from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
 import { BTCPayClient } from '../../src/core/client';
 import { Cryptography as myCrypto } from '../../src/core/cryptography';
 
 const IGNORE_SANDBOX_ERROR = process.env['BTCPAY_IGNORE_SANDBOX_ERROR'];
 const USER_NAME = 'test@example.com';
 const PASSWORD = 'satoshinakamoto';
-const URL = 'https://testnet.demo.btcpayserver.org/';
+const URL = 'http://127.0.0.1:49392';
 
 const MY_PRIVATE_KEY = Buffer.from(
   '31eb31ecf1a640c9d1e0a1105501f36235f8c7d51d67dcf74ccc968d74cb6b25',
   'hex',
 );
+let STORE_ID = '';
+const WINDOW_WIDTH = 1920;
+const WINDOW_HEIGHT = 1080;
 
-const STORE_ID = 'HPPHFtqtsKsF3KU18fBNwVGP64hicGoRynvQrC3R2Rkw';
-const TOKENS = {
-  merchant: '96ukQNT5eoNwQyRjjpgbRMvbHa6iqAJ436Zu5gRVuWxf',
-};
+let INVOICE_ID = '';
+const HEADLESS = true;
 
-const INVOICE_ID = 'TRnwXeAkuLQihe22mJs7J4';
-
-const loginAndGetPairingCode = async (): Promise<any> => {
+const loginAndGetPairingCode = async (): Promise<{
+  browser: Browser;
+  page: Page;
+  pairingCode: string;
+}> => {
   const newTokenName = 'autotest ' + new Date().getTime();
 
-  const browser = await puppeteer.launch({ headless: true }).then(
-    v => v, // if success, passthrough
-    // if error, check for env and ignore sandbox and warn.
-    err => {
-      if (IGNORE_SANDBOX_ERROR === '1') {
-        console.warn(
-          'WARNING!!! Error occurred, Chromium will be started ' +
-            "without sandbox. This won't guarantee success.",
-        );
-        return puppeteer.launch({
-          headless: true,
-          ignoreDefaultArgs: ['--disable-extensions'],
-          args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
-      } else {
-        console.warn(
-          'If "No usable sandbox!" error, retry test with ' +
-            'BTCPAY_IGNORE_SANDBOX_ERROR=1',
-        );
-        throw err;
-      }
-    },
-  );
+  const browser = await puppeteer
+    .launch({
+      headless: HEADLESS,
+      args: ['--window-size=' + WINDOW_WIDTH + ',' + WINDOW_HEIGHT],
+    })
+    .then(
+      v => v, // if success, passthrough
+      // if error, check for env and ignore sandbox and warn.
+      err => {
+        if (IGNORE_SANDBOX_ERROR === '1') {
+          console.warn(
+            'WARNING!!! Error occurred, Chromium will be started ' +
+              "without sandbox. This won't guarantee success.",
+          );
+          return puppeteer.launch({
+            headless: HEADLESS,
+            ignoreDefaultArgs: ['--disable-extensions'],
+            args: [
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+              '--window-size=' + WINDOW_WIDTH + ',' + WINDOW_HEIGHT,
+            ],
+          });
+        } else {
+          console.warn(
+            'If "No usable sandbox!" error, retry test with ' +
+              'BTCPAY_IGNORE_SANDBOX_ERROR=1',
+          );
+          throw err;
+        }
+      },
+    );
   const page = (await browser.pages())[0];
-  await page.goto('https://testnet.demo.btcpayserver.org/Account/Login');
+  await page.setViewport({ width: WINDOW_WIDTH, height: WINDOW_HEIGHT });
+  try {
+    await page.goto(URL + '/Account/Login');
+  } catch (e) {
+    if (e.message === `net::ERR_CONNECTION_REFUSED at ${URL}/Account/Login`) {
+      browser.close();
+      console.log(
+        'Please start docker container locally:\n' +
+          'docker run -p 127.0.0.1:49392:49392 junderw/btcpay-client-test-server',
+      );
+      return {
+        page,
+        browser,
+        pairingCode: '',
+      };
+    }
+    throw e;
+  }
 
   await page.type('#Email', USER_NAME);
   await page.type('#Password', PASSWORD);
   await page.click('#LoginButton');
-  await page.goto(
-    'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
-      'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens/Create',
+  await page.goto(URL + '/stores');
+  await page.waitForSelector('#CreateStore');
+  await page.click(
+    'table.table.table-sm.table-responsive-md > tbody > ' +
+      'tr:nth-of-type(1) > td:nth-of-type(3) > a:nth-of-type(2)',
   );
+  await page.waitForSelector('#Id');
+  const idElement = await page.$$('#Id');
+  STORE_ID = (await idElement[0]
+    .getProperty('value')
+    .then(v => v.jsonValue())) as string;
+  await page.goto(URL + '/stores/' + STORE_ID + '/Tokens/Create');
   await page.waitForSelector('input#Label');
   await page.waitForSelector('[type="submit"]');
 
@@ -82,57 +120,22 @@ const loginAndGetPairingCode = async (): Promise<any> => {
   };
 };
 
-const deleteTokenAndClose = async (
-  browser: puppeteer.Browser,
-  page: puppeteer.Page,
-) => {
-  await page.goto(
-    'https://testnet.demo.btcpayserver.org/stores/HPPHFtqtsKsF3' +
-      'KU18fBNwVGP64hicGoRynvQrC3R2Rkw/Tokens',
-  );
-  await page.waitForSelector('table.table.table-sm.table-responsive-md');
-
-  const link = await page.evaluate(() => {
-    const el = document.querySelector(
-      'table.table.table-sm.table-responsive-md',
-    );
-    if (el === null) return '';
-    const tbody = el.children[1];
-    if (tbody === undefined) return '';
-    const secondTr = Array.from(tbody.children).filter(tr => {
-      return tr.children[0].textContent !== 'FOR TEST (DO NOT DELETE)';
-    })[0];
-    if (secondTr !== undefined) {
-      return secondTr.children[1].children[1].attributes[0].nodeValue;
-    } else {
-      return '';
-    }
-  });
-
-  if (link !== '') {
-    await page.goto('https://testnet.demo.btcpayserver.org' + link);
-    await page.waitForSelector('form > button.btn.btn-secondary.btn-danger');
-    await page.click('[type="submit"]');
-    await page.waitForSelector('div.alert.alert-success.alert-dismissible');
-  }
-  browser.close();
-};
-
 let MY_KEYPAIR: elliptic.ec.KeyPair;
 let client: BTCPayClient;
 describe('btcpay.core.client', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     jest.setTimeout(20000); // browser takes a while
     MY_KEYPAIR = myCrypto.load_keypair(MY_PRIVATE_KEY);
-    client = new BTCPayClient(URL, MY_KEYPAIR, TOKENS);
+    client = new BTCPayClient(URL, MY_KEYPAIR);
   });
 
   it('should pair with server', async () => {
     const pairingData = await loginAndGetPairingCode();
     const myClient = new BTCPayClient(URL, MY_KEYPAIR);
     const result = await myClient.pair_client(pairingData.pairingCode);
+    client = new BTCPayClient(URL, MY_KEYPAIR, result);
     expect(result.merchant).toBeDefined();
-    await deleteTokenAndClose(pairingData.browser, pairingData.page);
+    pairingData.browser.close();
     await expect(myClient.pair_client('hduheufhfuf')).rejects.toThrow(
       /^pairing code is not valid$/,
     );
@@ -148,6 +151,7 @@ describe('btcpay.core.client', () => {
       currency: 'USD',
       price: 1.12,
     });
+    INVOICE_ID = results.id;
     expect(results.bitcoinAddress).toBeDefined();
     await expect(
       client.create_invoice({
@@ -158,6 +162,7 @@ describe('btcpay.core.client', () => {
     await expect(
       client.create_invoice({
         currency: 'USD',
+        // @ts-ignore
         price: 'xkhdfhu',
       }),
     ).rejects.toThrow(/^Price must be a float$/);
