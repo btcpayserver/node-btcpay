@@ -20,17 +20,6 @@ docker exec $CONT bash -c "sed -i 's/sleep 2//g' /root/run_bitcoind_service.sh"
 docker exec $CONT bash -c "sed -i 's/\/cookie/\/tokens/g' /root/stopAndCookie/stopAndCookie.js"
 docker exec $CONT bash -c "sed -i 's/\/datadir\/RegTest\/.cookie/\/root\/btcpaytokens/g' /root/stopAndCookie/stopAndCookie.js"
 docker exec $CONT bash -c "sed -i 's/sleep infinity/node \/root\/stopAndCookie\/stopAndCookie.js \&\nsleep infinity/g' /root/start_everything.sh"
-
-# New checkout (for testing)
-# docker exec $CONT bash -c "cd /root/btcpayserver; \
-#   git fetch origin; \
-#   git checkout a5df029;"
-
-# Replace login files
-docker exec $CONT bash -c "sed -i 's/placeholder=\"Email\"/placeholder=\"Email\" value=\"test\@example.com\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
-docker exec $CONT bash -c "sed -i 's/placeholder=\"Password\"/placeholder=\"Password\" value=\"satoshinakamoto\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
-# Rebuild BTCPayServer
-docker exec $CONT bash -c "cd /root/btcpayserver; DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet build -c Release BTCPayServer/BTCPayServer.csproj"
-sleep 10
 docker stop $CONT
-docker commit $CONT $1
+docker commit $CONT $TEMP
+$DIR/build_stage2.sh $1
