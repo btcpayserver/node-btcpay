@@ -8,12 +8,11 @@ npm i btcpay
 ## Private key generation
 * Generate and save private key:
 ```bash
-$ node -p "require('btcpay').crypto.generate_keypair()"
-
->>> <Key priv: XXXXXXX pub: null >
+$ node -p "require('btcpay').crypto.generate_keypair().getPrivate('hex')"
+XXXXXXXXXXXXXXXXXXXXX
 ```
 
-Store the value of "priv" in a save place, e.g. environment variables
+Store the printed value in a safe place, e.g. environment variables
 
 ## Pairing
 
@@ -33,7 +32,7 @@ $ [space] BTCPAY_URL=https://mydomain.com/ BTCPAY_KEY=... BTCPAY_PAIRCODE=... no
 >>> { merchant: 'XXXXXX' }
 ```
 
-Store the value of "merchant" in a save place, e.g. environment variables
+Store the value of "merchant" in a safe place, e.g. environment variables
 
 ## Recreating a client
 After pairing your client to the store, you can recreate the client as needed and use it in your code
