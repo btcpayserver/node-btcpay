@@ -11,6 +11,8 @@ const WINDOW_WIDTH = 1920
 const WINDOW_HEIGHT = 1080
 const HEADLESS = true
 
+// const sleep = ms => new Promise(r => setTimeout(r,ms))
+
 function writeAddress(address, type) {
   fs.writeFileSync('/root/btcpay.address.' + type, address)
 }
@@ -89,8 +91,13 @@ async function main() {
     document.querySelector('#SavePrivateKeys').click();
     document.querySelector('#btn-generate').click();
   });
-  await page.waitForSelector('code.alert-link');
-  
+  await page.waitForSelector('#confirm');
+  await page.evaluate(() => {
+    document.querySelector('#confirm').click();
+    document.querySelector('#submit').click();
+  });
+  await page.waitForSelector('#PayJoinEnabled');
+
   // Enable PayJoin
   await page.evaluate(() => {
     document.querySelector('#PayJoinEnabled').click();
@@ -134,7 +141,12 @@ async function main() {
     document.querySelector('#SavePrivateKeys').click();
     document.querySelector('#btn-generate').click();
   });
-  await page.waitForSelector('code.alert-link');
+  await page.waitForSelector('#confirm');
+  await page.evaluate(() => {
+    document.querySelector('#confirm').click();
+    document.querySelector('#submit').click();
+  });
+  await page.waitForSelector('#PayJoinEnabled');
   
   // Enable PayJoin
   await page.evaluate(() => {

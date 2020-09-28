@@ -28,13 +28,13 @@ sleep 3; \
 # Install BTCPayServer
 RUN git clone https://github.com/btcpayserver/btcpayserver.git && \
   cd btcpayserver/ && \
-  git checkout f8b2b18 && \
+  git checkout 80e46db && \
   DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet build -c Release BTCPayServer/BTCPayServer.csproj
 
 # Re-install NBXplorer because I'm an idiot
 RUN cd NBXplorer/ && \
   git fetch origin && \
-  git checkout 8635bc9 && \
+  git checkout ce2f21f && \
   DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet build -c Release NBXplorer/NBXplorer.csproj
 
 RUN sed -i 's/generate 432/generatetoaddress 432 \$\(bitcoin-cli -regtest getnewaddress\)/g' /root/run_bitcoind_service.sh

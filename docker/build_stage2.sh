@@ -13,13 +13,13 @@ docker exec $CONT bash -c "kill \$(pgrep node)"
 docker exec $CONT bitcoin-cli -regtest stop
 
 # New checkout (for testing)
-docker exec $CONT bash -c "cd /root/btcpayserver; \
-  git fetch origin; \
-  git checkout 79c70b3;"
+# docker exec $CONT bash -c "cd /root/btcpayserver; \
+#   git fetch origin; \
+#   git checkout 79c70b3;"
 
 # Replace login files
-docker exec $CONT bash -c "sed -i 's/placeholder=\"Email\"/placeholder=\"Email\" value=\"test\@example.com\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
-docker exec $CONT bash -c "sed -i 's/placeholder=\"Password\"/placeholder=\"Password\" value=\"satoshinakamoto\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
+docker exec $CONT bash -c "sed -i 's/input asp-for=\"Email\"/input asp-for=\"Email\" value=\"test\@example.com\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
+docker exec $CONT bash -c "sed -i 's/input asp-for=\"Password\"/input asp-for=\"Password\" value=\"satoshinakamoto\"/g' /root/btcpayserver/BTCPayServer/Views/Account/Login.cshtml"
 # Rebuild BTCPayServer
 docker exec $CONT bash -c "cd /root/btcpayserver; DOTNET_CLI_TELEMETRY_OPTOUT=1 dotnet build -c Release BTCPayServer/BTCPayServer.csproj"
 sleep 2
