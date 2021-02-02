@@ -18,7 +18,11 @@
     "test": "npm run format:ci && npm run lint && npm run coverage",
     "unit": "jest --config=jest.json --runInBand"
   },
-  "author": "Tim Akinbo <tim@tanjalo.com>; Christoph Ott <christoph.ott@lean-coders.at>",
+  "contributors": [
+    "Tim Akinbo <tim@tanjalo.com>",
+    "Christoph Ott <christoph.ott@lean-coders.at>",
+    "Jonathan Underwood <junderwood@bitcoinbank.co.jp>"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
