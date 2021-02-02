@@ -41,7 +41,7 @@ const btcpay = require('btcpay')
 const keypair = btcpay.crypto.load_keypair(new Buffer.from(<PRIVATEKEY>, 'hex'))
 
 // Recreate client
-const client = new btcpay.BTCPayClient(<BCTPAYURL>, keypair, {merchant: <MERCHANT>})
+const client = new btcpay.BTCPayClient(<BTCPAYURL>, keypair, {merchant: <MERCHANT>})
 ```
 
 ### Get rates
