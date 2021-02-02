@@ -79,8 +79,6 @@ const loginAndGetPairingCode = async (): Promise<{
     throw e;
   }
 
-  await page.type('#Email', USER_NAME);
-  await page.type('#Password', PASSWORD);
   await page.click('#LoginButton');
   await page.goto(URL + '/stores');
   await page.waitForSelector('#CreateStore');
