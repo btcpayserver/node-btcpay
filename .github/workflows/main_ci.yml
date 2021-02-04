@@ -1,0 +1,55 @@
+name: Run Tests
+
+on: [push]
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    services:
+      btcpay:
+        image: junderw/btcpay-client-test-server@sha256:2ab65051329e0250cd7d5ff3f3182a95d81228e469b518beb570a288f313e5c1
+        ports:
+          - 49392:49392
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm test
+  coverage-check:
+    runs-on: ubuntu-latest
+    services:
+      btcpay:
+        image: junderw/btcpay-client-test-server@sha256:2ab65051329e0250cd7d5ff3f3182a95d81228e469b518beb570a288f313e5c1
+        ports:
+          - 49392:49392
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run coverage
+  lint-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run lint
+  format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm run format:ci
