@@ -1,7 +1,7 @@
 export interface Invoice {
   url: string;
   posData: string | null;
-  status: string;
+  status: 'new' | 'paid' | 'confirmed' | 'complete' | 'expired' | 'invalid';
   btcPrice: string;
   btcDue: string;
   cryptoInfo: Array<{
