@@ -29,24 +29,15 @@ export class Cryptography {
     message: crypto.BinaryLike,
     kp: elliptic.ec.KeyPair,
   ): Buffer {
-    const digest = crypto
-      .createHash('sha256')
-      .update(message)
-      .digest();
+    const digest = crypto.createHash('sha256').update(message).digest();
     return Buffer.from(kp.sign(digest).toDER());
   }
 
   private static get_version_from_compressed_key(
     pk: crypto.BinaryLike,
   ): Buffer {
-    const sh2 = crypto
-      .createHash('sha256')
-      .update(pk)
-      .digest();
-    const rp = crypto
-      .createHash('ripemd160')
-      .update(sh2)
-      .digest();
+    const sh2 = crypto.createHash('sha256').update(pk).digest();
+    const rp = crypto.createHash('ripemd160').update(sh2).digest();
 
     return Buffer.concat([
       Buffer.from('0F', 'hex'),
@@ -56,14 +47,8 @@ export class Cryptography {
   }
 
   private static get_checksum_from_version(version: crypto.BinaryLike): Buffer {
-    const h1 = crypto
-      .createHash('sha256')
-      .update(version)
-      .digest();
-    const h2 = crypto
-      .createHash('sha256')
-      .update(h1)
-      .digest();
+    const h1 = crypto.createHash('sha256').update(version).digest();
+    const h2 = crypto.createHash('sha256').update(h1).digest();
 
     return h2.slice(0, 4);
   }
