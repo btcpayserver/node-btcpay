@@ -33,9 +33,9 @@ const loginAndGetPairingCode = async (): Promise<{
       args: ['--window-size=' + WINDOW_WIDTH + ',' + WINDOW_HEIGHT],
     })
     .then(
-      v => v, // if success, passthrough
+      (v) => v, // if success, passthrough
       // if error, check for env and ignore sandbox and warn.
-      err => {
+      (err) => {
         if (IGNORE_SANDBOX_ERROR === '1') {
           console.warn(
             'WARNING!!! Error occurred, Chromium will be started ' +
@@ -90,7 +90,7 @@ const loginAndGetPairingCode = async (): Promise<{
   const idElement = await page.$$('#Id');
   STORE_ID = (await idElement[0]
     .getProperty('value')
-    .then(v => v.jsonValue())) as string;
+    .then((v) => v?.jsonValue())) as string;
   await page.goto(URL + '/stores/' + STORE_ID + '/Tokens/Create');
   await page.waitForSelector('input#Label');
   await page.waitForSelector('[type="submit"]');
@@ -104,13 +104,17 @@ const loginAndGetPairingCode = async (): Promise<{
     const el = document.querySelector(
       'div.alert.alert-success.alert-dismissible',
     );
-    if (el === null) return '';
+    if (el === null) {
+      return '';
+    }
     return el.innerHTML;
   });
   const pairingCode = (contents.match(
     /Server initiated pairing code: (\S{7})/,
   ) || [])[1];
-  if (!pairingCode) throw new Error('Could not get pairing code');
+  if (!pairingCode) {
+    throw new Error('Could not get pairing code');
+  }
   return {
     browser,
     page,
