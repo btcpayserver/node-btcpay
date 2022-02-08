@@ -1,3 +1,5 @@
+> :warning: This package is deprecated, BTCPay Server is exposing a new, more complete and easy to use API called `Greenfield`. [Check the doc](https://docs.btcpayserver.org/Development/GreenFieldExample/)
+
 # node-btcpay
 
 ## Install
