@@ -49,7 +49,7 @@ const client = new btcpay.BTCPayClient(<BTCPAYURL>, keypair, {merchant: <MERCHAN
 ### Get rates
 Fetches current rates from BitcoinAverage (using your BTCPayServer)
 ```js
-client.get_rates(['BTC_USD'], <STOREID>)
+client.get_rates(['BTC_USD']) // Or pass a store ID as the second argument.
   .then(rates => console.log(rates))
   .catch(err => console.log(err))
 ```

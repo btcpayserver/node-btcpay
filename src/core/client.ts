@@ -57,11 +57,11 @@ export class BTCPayClient {
 
   public async get_rates(
     currencyPairs: string[],
-    storeID: string,
+    storeID?: string,
   ): Promise<Rate[]> {
     return this.signed_get_request('/rates', {
       currencyPairs: currencyPairs.join(','),
-      storeID,
+      ...(storeID !== undefined && { storeID }),
     });
   }
 
